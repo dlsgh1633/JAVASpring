@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.MemberMapper">
+
+
+
+	<insert id="registerMember">
+
+		insert into MEMBER (NAME, EMAIL, PASSWORD, TEL, ADDR, ADDR_DETAIL,
+		STREETNUM, PS, REG_DATE, MODIFY_DATE)
+		values
+		(#{NAME},#{EMAIL},#{PASSWORD},#{TEL},#{ADDR},#{ADDR_DETAIL},#{STREETNUM},#{PS},#{REG_DATE},#{MODIFY_DATE,
+		jdbcType=DATE})
+
+	</insert>
+
+	<select id="checkName" resultType="int">
+		SELECT COUNT(*) FROM MEMBER WHERE NAME = #{NAME}
+	</select>
+
+	<select id="checkMail" resultType="int">
+		SELECT COUNT(*) FROM MEMBER WHERE EMAIL = #{EMAIL}
+	</select>
+
+	<select id="findUserEmail" resultType="com.example.demo.model.MemberDto">
+		SELECT
+		NAME, EMAIL, PASSWORD, TEL, ADDR, ADDR_DETAIL, STREETNUM, PS,
+		REG_DATE, MODIFY_DATE, MEMBERID
+		FROM MEMBER
+		WHERE EMAIL = #{EMAIL}
+	</select>
+
+</mapper>

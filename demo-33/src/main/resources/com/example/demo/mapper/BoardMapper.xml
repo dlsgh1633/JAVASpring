@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.BoardMapper">
+
+	<insert id="registerBoard" >
+
+		insert into BOARD (TITLE, CONTENT, MEMBERID ,REG_DATE, MODIFY_DATE)
+		values
+		(#{TITLE},#{CONTENT},#{MEMBERID},sysdate,#{MODIFY_DATE,jdbcType=DATE})
+	 <selectKey keyProperty="BOARDID" resultType="int" order="AFTER">
+	 	select max(BOARDID) from BOARD
+	 </selectKey>
+	</insert>
+
+<!-- 
+	<select id="boardList"
+		resultType="com.example.demo.model.BoardDto">
+		SELECT
+		b.BOARDID,
+		b.TITLE,
+		b.CONTENT,
+		b.MEMBERID,
+		b.REG_DATE,
+		b.MODIFY_DATE,
+		b.BOARD_DELETE,
+		m.NAME AS MEMBER_NAME
+		FROM BOARD b
+		JOIN MEMBER m ON b.MEMBERID = m.MEMBERID
+		WHERE b.BOARD_DELETE = 0
+	</select>
+	 -->
+	<select id="countBoard" resultType="int">
+		SELECT COUNT(*) FROM BOARD WHERE BOARD_DELETE = 0
+	</select> 
+	
+	<!--  RowNum으로 리스트 뽑아오기 .  -->
+	<select id="pageBoardList" resultType = "com.example.demo.model.BoardDto">
+		SELECT * FROM 
+		(	
+		  SELECT ROWNUM RN, A.*
+		  FROM 
+		  	( 
+		  	SELECT
+		  	  b.BOARDID,
+		  	  b.TITLE,
+		  	  b.CONTENT,
+		  	  b.MEMBERID,
+		  	  b.REG_DATE,
+		  	  b.MODIFY_DATE,
+		  	  b.BOARD_DELETE,
+		  	  m.NAME AS MEMBER_NAME,
+		  	   (SELECT COUNT(*) FROM COMMENTS c WHERE c.BOARDID = b.BOARDID) AS count
+		  	 FROM BOARD b
+		  	  JOIN MEMBER m ON b.MEMBERID = m.MEMBERID
+		  	  WHERE b.BOARD_DELETE = 0
+		  	  ORDER BY b.BOARDID DESC 
+		  	) A
+		)
+		WHERE RN BETWEEN  #{start} AND #{end}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<select id="getBoardlist" resultType = "com.example.demo.model.BoardDto">
+		select * from BOARD where BOARDID = #{BOARDID}
+	</select>
+	
+	<update id="boardUpdate">
+		update BOARD set TITLE = #{TITLE}, CONTENT = #{CONTENT}, MODIFY_DATE = sysdate where BOARDID = #{BOARDID} 
+	</update>
+
+	<update id="boardDelete">
+		update BOARD set BOARD_DELETE = 1 where BOARDID = #{BOARDID}
+	</update>
+	
+
+	
+	
+	
+
+</mapper>

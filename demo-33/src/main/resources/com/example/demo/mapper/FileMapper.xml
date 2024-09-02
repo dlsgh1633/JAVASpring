@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.FileMapper">
+
+
+
+	<update id="insertFile" parameterType="java.util.List">
+		INSERT ALL
+		<foreach item="file" collection="list">
+			into BOARD_FILE
+			(ORG_FILE_NAME, FILE_NAME, REG_DATE, MODIFY_DATE,
+			BOARDID, FILE_SIZE,
+			FILE_DELETE)
+			values
+			(
+			#{file.ORG_FILE_NAME},
+			#{file.FILE_NAME},
+			sysdate,
+			#{file.MODIFY_DATE,jdbcType=DATE},
+			#{file.BOARDID},
+			#{file.FILE_SIZE},
+			0
+
+			)
+		</foreach>
+		SELECT * FROM DUAL
+	</update>
+
+	<select id="fileList"
+		resultType="com.example.demo.model.FileDto">
+		select * from BOARD_FILE
+		where FILE_DELETE = 0 AND BOARDID =
+		#{BOARDID}
+	</select>
+
+	<select id="findByUUID"
+		resultType="com.example.demo.model.FileDto">
+		select * from BOARD_FILE where FILE_DELETE = 0 AND
+		FILE_NAME = #{FILE_NAME}
+	</select>
+
+	<update id="updateDeleteFlagByUUIDs"
+		parameterType="java.util.List">
+		UPDATE BOARD_FILE
+		SET FILE_DELETE = 1
+		WHERE FILE_NAME IN
+		<foreach item="uuid" collection="list" open="(" separator=","
+			close=")">
+			#{uuid}
+		</foreach>
+	</update>
+
+	<update id="boardDeleteFile">
+    UPDATE BOARD_FILE bf
+    SET bf.FILE_DELETE = 1
+    WHERE bf.BOARDID = #{BOARDID}
+      AND EXISTS (
+          SELECT 1
+          FROM BOARD b
+          WHERE b.BOARDID = bf.BOARDID
+            AND b.BOARD_DELETE = 1
+      )
+	</update>
+
+</mapper>

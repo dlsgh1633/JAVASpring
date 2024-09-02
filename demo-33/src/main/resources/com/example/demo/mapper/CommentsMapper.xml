@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.CommentsMapper">
+
+
+	<insert id="RegisterComment">
+		insert into COMMENTS (BOARDID, MEMBERID, CONTENT,
+		REG_DATE, MODIFY_DATE, PARENTSID,
+		COMMENT_DELETE)
+		values
+		(#{BOARDID},#{MEMBERID},#{CONTENT},sysdate,#{MODIFY_DATE,
+		jdbcType=DATE},#{PARENTSID},0)
+	</insert>
+
+
+	<select id="listComment"
+		resultType="com.example.demo.model.CommentDto">
+		SELECT LEVEL, C.*
+		FROM (
+		SELECT
+		C.COMMENTID,
+		C.CONTENT ,
+		C.REG_DATE,
+		C.BOARDID,
+		C.MEMBERID,
+		M.NAME,
+		C.PARENTSID,
+		C.COMMENT_DELETE
+		FROM COMMENTS C
+		JOIN MEMBER M ON C.MEMBERID = M.MEMBERID
+		WHERE C.BOARDID
+		= #{boardId}
+		) C
+
+		START WITH PARENTSID = 0
+		CONNECT BY PRIOR C.COMMENTID = C.PARENTSID
+		ORDER
+		SIBLINGS BY
+		C.COMMENTID
+	</select>
+
+	<update id="modifyComment">
+		update COMMENTS set CONTENT = #{CONTENT},MODIFY_DATE
+		= sysdate
+		where COMMENTID = #{COMMENTID}
+
+	</update>
+
+	<update id="deleteComment">
+		update COMMENTS set COMMENT_DELETE = 1
+		where COMMENTID
+		= #{COMMENTID}
+	</update>
+
+	<select id="countComment" resultType="int">
+		SELECT COUNT(*)
+		FROM COMMENTS
+		WHERE BOARDID = #{boardId}
+	</select>
+
+
+
+</mapper>
