@@ -35,7 +35,7 @@ import com.example.demo.service.CommentsService;
 import com.example.demo.service.FileService;
 
 @Controller
-public class BoardController {
+public class BoardController { 
 
 	private final BoardService boardService;
 	private final FileUtis fileUtis;
