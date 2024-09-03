@@ -1,23 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="">
 <meta name="author" content="">
 
 <title>SB Admin 2 - Register</title>
 
 <!-- Custom fonts for this template-->
-<link href="/resources/vendor/fontawesome-free/css/all.min.css"
-	rel="stylesheet" type="text/css">
-<link
-	href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-	rel="stylesheet">
+<link href="/resources/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
 <!-- Custom styles for this template-->
 <link href="/resources/css/sb-admin-2.min.css" rel="stylesheet">
@@ -35,79 +30,60 @@
 							<div class="text-center">
 								<h1 class="h4 text-gray-900 mb-4">회원가입</h1>
 							</div>
-							<form class="user" method="post" name="memberForm"
-								id="memberForm" action="/member/membership">
+							<form class="user" method="post" name="memberForm" id="memberForm" action="/member/membership">
 								<div class="form-group">
-									<input type="text" name="NAME" id="name"
-										class="form-control form-control-user" placeholder="이름"
-										maxlength="10"> <input type="hidden"
-										id="nameduplication" name="nameduplication" value="false">
+									<input type="text" name="NAME" id="name" class="form-control form-control-user" placeholder="이름" maxlength="10">
+									<input type="hidden" id="nameduplication" name="nameduplication" value="false">
 								</div>
 								<div id="nameMessage" class="text-center"></div>
 								<div class="form-group row">
 									<div class="col-sm-9 mb-3 mb-sm-0">
-										<input type="text" name="EMAIL" id="EMAIL"
-											class="form-control form-control-user" placeholder="이메일주소">
+										<input type="text" name="EMAIL" id="EMAIL" class="form-control form-control-user" placeholder="이메일주소">
 									</div>
 									<div id="emailMessage" class="text-center"></div>
 
 									<div class="col-sm-3">
-										<button type="button"
-											class="btn btn-primary btn-user btn-block" id="checkEmail"
-											name="checkEmail">중복확인</button>
+										<button type="button" class="btn btn-primary btn-user btn-block" id="checkEmail" name="checkEmail">중복확인</button>
 									</div>
-									<input type="hidden" id="emailduplication"
-										name="emailduplication" value="false">
+									<input type="hidden" id="emailduplication" name="emailduplication" value="false">
 								</div>
 								<div class="form-group row">
 									<div class="col-sm-6 mb-3 mb-sm-0">
-										<input type="password" name="PASSWORD" id="PASSWORD"
-											class="form-control form-control-user" placeholder="비밀번호">
+										<input type="password" name="PASSWORD" id="PASSWORD" class="form-control form-control-user" placeholder="비밀번호">
 									</div>
 									<div class="col-sm-6">
-										<input type="password" name="PASSWORD2" id="PASSWORD2"
-											class="form-control form-control-user" placeholder="비밀번호 확인">
+										<input type="password" name="PASSWORD2" id="PASSWORD2" class="form-control form-control-user" placeholder="비밀번호 확인">
 									</div>
 								</div>
 								<div class="form-group">
-									<input type="text" name="TEL" id="TEL"
-										class="form-control form-control-user" placeholder="휴대폰번호" maxlength="13">
+									<input type="text" name="TEL" id="TEL" class="form-control form-control-user" placeholder="휴대폰번호" maxlength="13">
 								</div>
 								<div class="form-group row">
 									<div class="col-sm-9 mb-3 mb-sm-0">
-										<input type="text" name="ADDR" id="sample6_address"
-											class="form-control form-control-user" placeholder="주소" readonly>
+										<input type="text" name="ADDR" id="sample6_address" class="form-control form-control-user" placeholder="주소" readonly>
 									</div>
 									<div class="col-sm-3">
-										<input type="button" onclick="sample6_execDaumPostcode()"
-											class="btn btn-primary btn-user btn-block" value=" 주소찾기" >
+										<input type="button" onclick="sample6_execDaumPostcode()" class="btn btn-primary btn-user btn-block" value=" 주소찾기">
 									</div>
 								</div>
 								<div class="form-group">
-									<input type="text" name="ADDR_DETAIL"
-										id="sample6_detailAddress"
-										class="form-control form-control-user" placeholder="상세주소">
+									<input type="text" name="ADDR_DETAIL" id="sample6_detailAddress" class="form-control form-control-user" placeholder="상세주소">
 								</div>
 								<div class="form-group row">
 									<div class="col-sm-6 mb-3 mb-sm-0">
-										<input type="text" name="STREETNUM" id="sample6_postcode" name="sample6_postcode"
-											class="form-control form-control-user" placeholder="우편번호" readonly>
+										<input type="text" name="STREETNUM" id="sample6_postcode" name="sample6_postcode" class="form-control form-control-user" placeholder="우편번호" readonly>
 									</div>
 									<div class="col-sm-6">
-										<input type="text" name="PS" id="sample6_extraAddress"
-											class="form-control form-control-user" placeholder="참고사항" readonly>
+										<input type="text" name="PS" id="sample6_extraAddress" class="form-control form-control-user" placeholder="참고사항" readonly>
 									</div>
 								</div>
 
 								<!--   <a href="login.html" class="btn btn-primary btn-user btn-block"> Register Account</a> -->
-								<button type="submit" id="submitCheck" name="submitCheck"
-									class="btn btn-primary btn-user btn-block">Register
-									Account</button>
+								<button type="submit" id="submitCheck" name="submitCheck" class="btn btn-primary btn-user btn-block">Register Account</button>
 							</form>
 							<hr>
 							<div class="text-center">
-								<a class="small" href="/member/login">Already have an
-									account? Login!</a>
+								<a class="small" href="/member/login">Already have an account? Login!</a>
 							</div>
 						</div>
 					</div>
@@ -118,8 +94,7 @@
 
 	<!-- Bootstrap core JavaScript-->
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
 
 	<script src="/resources/vendor/jquery/jquery.min.js"></script>
 	<script src="/resources/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -130,8 +105,7 @@
 	<!-- Custom scripts for all pages-->
 	<script src="/resources/js/sb-admin-2.min.js"></script>
 	<!--  요건 다음 api -->
-	<script
-		src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 
 </body>

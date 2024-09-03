@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -75,8 +77,8 @@ public class BoardController {
 		// 나중에 DTO 클래스를 이용해서 파일업로드시 -> 임시파일이 생성되는지 디버깅해서 알아보기
 		//트랜잭션 처리 ? 
 	@PostMapping("/board/postwrite")
-	public ResponseEntity<BoardDto> postWrite(@RequestParam("TITLE") String title,
-			@RequestParam("CONTENT") String content,
+	public ResponseEntity<BoardDto> postWrite(@RequestParam("TITLE") @Valid String title,
+			@RequestParam("CONTENT") @Valid String content,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -87,13 +89,14 @@ public class BoardController {
 		boardDto.setCONTENT(content);
 		boardDto.setMEMBERID(userDetails.getUserid());
 		boardService.RegisterBoard(boardDto);
-			
+		
+	 	
 		if (files != null && !files.isEmpty()) {
 			List<FileDto> uploadedFiles = fileUtis.uploadFiles(files);
 			System.out.println("Boardid는 등록이 되고나서 가져와진건가 ? " + boardDto.getBOARDID());
 			fileService.saveFiles(boardDto.getBOARDID(), uploadedFiles);
 		}
-
+ 
 		return ResponseEntity.ok(boardDto);
 	}
 
@@ -119,8 +122,8 @@ public class BoardController {
 
 	// UUID 리스트 테스트
 	@PostMapping("/board/postmodify")
-	public ResponseEntity<BoardDto> postModify(@RequestParam("TITLE") String title,
-			@RequestParam("CONTENT") String content,@RequestParam("BOARDID") int boardId,
+	public ResponseEntity<BoardDto> postModify(@RequestParam("TITLE") @Valid String title,
+			@RequestParam("CONTENT") @Valid String content,@RequestParam("BOARDID") int boardId,
 			@RequestParam(value = "FILE_NAME", required = false) List<String> FILE_NAME,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
 	

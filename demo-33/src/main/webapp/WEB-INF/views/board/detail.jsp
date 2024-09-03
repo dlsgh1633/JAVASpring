@@ -1,7 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/security/tags"
-	prefix="sec"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -29,67 +28,54 @@
 							<!-- Basic Card Example -->
 							<div class="card shadow mb-4 h-100">
 								<div class="card-header py-3">
-									<h6 class="m-0 font-weight-bold text-primary btn float-left">
-										${boardcheck.TITLE}</h6>
-										<input type="hidden" name="memberId" value = "${boardcheck.MEMBERID}">
+									<h6 class="m-0 font-weight-bold text-primary btn float-left">${boardcheck.TITLE}</h6>
+									<input type="hidden" name="memberId" value="${boardcheck.MEMBERID}">
 									<c:choose>
 										<c:when test="${not empty pageContext.request.userPrincipal}">
-											<sec:authentication var="sessionUser"
-												property="principal.userid" />
+											<sec:authentication var="sessionUser" property="principal.userid" />
 											<c:if test="${sessionUser == boardcheck.MEMBERID}">
-												<a
-													href='/board/modify?boardId=<c:out value="${boardcheck.BOARDID}"/>'>
-													<button type="button"
-														class="btn btn-primary btn float-right ml-1">수정</button>
+												<a href='/board/modify?boardId=<c:out value="${boardcheck.BOARDID}"/>'>
+													<button type="button" class="btn btn-primary btn float-right ml-1">수정</button>
 												</a>
-												<button type="button" id="deleteButton"
-													class="btn btn-danger btn float-right">삭제</button>
+												<button type="button" id="deleteButton" class="btn btn-danger btn float-right">삭제</button>
 											</c:if>
 										</c:when>
 									</c:choose>
 								</div>
-								<div class="card-body navbar-nav-scroll"
-									style="height: 290px !important">${boardcheck.CONTENT}</div>
+								<div class="card-body navbar-nav-scroll" style="height: 290px !important">${boardcheck.CONTENT}</div>
 								<div class="card-body fileUpLoad">
 									<label class="fileUpLoadBtn"></label>
 									<div id="fileName" class="fileName">
 										<c:forEach var="FileList" items="${fileList}">
 
-											<a
-												href="/board/${boardcheck.BOARDID}/files/${FileList.FILE_NAME}/download">${FileList.ORG_FILE_NAME}</a>
+											<a href="/board/${boardcheck.BOARDID}/files/${FileList.FILE_NAME}/download">${FileList.ORG_FILE_NAME}</a>
 
 										</c:forEach>
 
 									</div>
-									
+
 								</div>
 								<div class="card-footer">
 									<form action="#" id="replyForm" name="replyForm">
-									 	
-										<input type="hidden" name="boardNo" value="1"> <input
-											type="hidden" name="parentCommentNo" value="0"> <input
-											type="hidden" name="commentNo" value="0">
-										
-										 
-										<ul id="commentDiv"
-											style="max-height: 500px; overflow-y: scroll; overflow-x: hidden;">
-												
+
+										<input type="hidden" name="boardNo" value="1">
+										<input type="hidden" name="parentCommentNo" value="0">
+										<input type="hidden" name="commentNo" value="0">
+
+										<ul id="commentDiv" style="max-height: 500px; overflow-y: scroll; overflow-x: hidden;">
+
 										</ul>
 									</form>
-								 <c:if test="${not empty pageContext.request.userPrincipal}">
-									<form class="flex" id="commentForm" name="commentForm">
-										<input type="hidden" name="boardNo" value="1">
-										<textarea id="a3" cols="30" row="5" class="form-control flex"
-											style="width: 90%"
-											placeholder="내용">   
+									<c:if test="${not empty pageContext.request.userPrincipal}">
+										<form class="flex" id="commentForm" name="commentForm">
+											<input type="hidden" name="boardNo" value="1">
+											<textarea id="a3" cols="30" row="5" class="form-control flex" style="width: 90%" placeholder="내용">   
 										</textarea>
-										<a class="commentAdd flex" style="width: 9%">
-											<button type="button" id="commentbutton"
-												class="btn btn-primary btn ml-1"
-												style="margin-top: 0.75rem; width: 100%">등록</button>
-										</a>
-									</form>
-								  </c:if>	
+											<a class="commentAdd flex" style="width: 9%">
+												<button type="button" id="commentbutton" class="btn btn-primary btn ml-1" style="margin-top: 0.75rem; width: 100%">등록</button>
+											</a>
+										</form>
+									</c:if>
 								</div>
 							</div>
 						</div>
@@ -108,8 +94,8 @@
 	<!-- End of Page Wrapper -->
 
 	<!-- Scroll to Top Button-->
-	<a class="scroll-to-top rounded" href="#page-top"
-		style="display: none;"> <i class="fas fa-angle-up"></i>
+	<a class="scroll-to-top rounded" href="#page-top" style="display: none;">
+		<i class="fas fa-angle-up"></i>
 	</a>
 
 
@@ -136,9 +122,23 @@
 $(document).ready(function(){
 	
 	commentListload();
-	
+	$('#a3').val('');
 	
 });
+
+function CommentDate (comment){
+	 let today = new Date(comment);
+     let year =  today.getFullYear();
+     let month = ('0'+(today.getMonth()+1)).slice(-2);
+     let day = ('0' + today.getDate()).slice(-2);
+     let hours = ('0' + today.getHours()).slice(-2);
+     let minutes = ('0' + today.getMinutes()).slice(-2);
+     let seconds = ('0' + today.getSeconds()).slice(-2); 
+
+     return year + '-' + month + '-' + day +' '+ hours + ":" + minutes + ':' + seconds ;
+}
+
+
 
 //댓글 및 대댓글 불러오기
 function commentListload(){
@@ -160,12 +160,13 @@ function commentListload(){
 		},	
 		success : function(response){
 			 response.forEach(function(comment) {
-		       console.log(comment);     
-		       
+		       console.log(comment);
+	       
 		       const padding = comment.level * 12+'px';
 		       const commentOwner = comment.commentid;
 		       const boardOwner = comment.boardid;
 		       
+		       const commentFormat = CommentDate(comment.reg_DATE); 
 		       
 			   let commentHTML = 
 				     "<li >" +
@@ -174,7 +175,7 @@ function commentListload(){
 	                    "<div class='commentHead'>" +
 	                    "<div class='commentHead1'>" +
 	                    "<div class='commentName write-name'>" + comment.name + "</div>" +
-	                    "<div class='commentDate'>" + comment.reg_DATE + "</div>" +
+	                    "<div class='commentDate'>" + commentFormat + "</div>" +
 	                    "</div>" +
 	                    "<div class='commentHead2'>"; 
 	                    
@@ -233,7 +234,11 @@ if (confirm("게시글을 삭제 하시겠습니까?")) {
       success: function(response) {
           alert("삭제가 완료되었습니다");
           window.location.href = "/main";
-      }
+      },
+		 error : function(request,status,error){
+			 alert("에러가 발생했습니다.");
+			 window.location.href ="/error/error";
+		 }
   	
   });
 } else {
@@ -245,11 +250,11 @@ if (confirm("게시글을 삭제 하시겠습니까?")) {
 //댓글 등록
 $('#commentbutton').on('click',function(){
 	boardId = ${boardcheck.BOARDID};
-	content = $('#a3').val();
+	content = $('#a3').val().trim();
 	console.log("등록버튼 안눌림 ?"+boardId);
 	
-	
-	if(content == ''){
+
+	if(content === ''){
 		alert("내용을 입력해주세요.");
 		return false;
 	}
@@ -269,7 +274,11 @@ $('#commentbutton').on('click',function(){
 			commentListload();
 			$('#a3').val('');
 
-		}	
+		},
+		 error : function(request,status,error){
+			 alert("에러가 발생했습니다.");
+			 window.location.href ="/error/error";
+		 }	
 	
 	});
 	
@@ -282,10 +291,7 @@ $('#commentDiv').on('click',".commentReply", function() {
     let writeName = $(this).closest('.commentDiv').find('.commentName').text();
     console.log( "writeName 왜 안나오노"+writeName);
    
-    
-   
-    
-    
+  
     if (commentLi.next().hasClass('reply-form')) {
         commentLi.next().remove();
         return;
@@ -322,9 +328,6 @@ $('#commentDiv').on('click',".commentModify",function(){
         return;
     }
     
-    
-    
-    
     commentDiv.find('.comment').empty().append(`
     		
     		
@@ -333,12 +336,10 @@ $('#commentDiv').on('click',".commentModify",function(){
             
         `);
     
-    
    $('.modfiyComment').val(modifyReply);
    $('.modfiyComment').focus();
     
-  
-    
+
 });
 
 
@@ -346,13 +347,13 @@ $('#commentDiv').on('click',".commentModify",function(){
 $('#replyForm').on('click',".replysubmit", function(){
 	 let parentId = $(this).closest('li').prev('li').find('.comment-id').val();
 	 let boardId = ${boardcheck.BOARDID};
-	 let content = $(this).closest('.reply-form').find('.replytext').val();
+	 let content = $(this).closest('.reply-form').find('.replytext').val().trim();
 	
 	console.log("부모댓글 ID " +parentId);
 	console.log("대댓글 게시판 ID :" + boardId);
 	console.log("대댓글 내용  :" + content);
 	
-		if(content == ''){
+		if(content === ''){
 			alert("내용을 입력해주세요");
 			return false;
 		}
@@ -372,7 +373,11 @@ $('#replyForm').on('click',".replysubmit", function(){
 				commentListload();
 				$('.replytext').val('');
 				
-			}	
+			},
+			 error : function(request,status,error){
+				 alert("에러가 발생했습니다.");
+				 window.location.href ="/error/error";
+			 }	
 		});
 });
 
@@ -380,9 +385,9 @@ $('#replyForm').on('click',".replysubmit", function(){
 $('#commentDiv').on('click',".modifybutton",function(){
 	
 	let commentId = $(this).closest('.commentDiv').find('.comment-id').val();
-	let content = $(this).closest('.commentDiv').find('.modfiyComment').val();
+	let content = $(this).closest('.commentDiv').find('.modfiyComment').val().trim();
 	
-	if(content == ''){
+	if(content === ''){
 		alert("내용을 입력해주세요.");
 		return false;
 	}
@@ -411,9 +416,7 @@ $('#commentDiv').on('click',".modifybutton",function(){
 // 댓글 삭제 
 $('#commentDiv').on('click', ".commentRemove", function() {
     let deleteId = $(this).closest('.commentDiv').find('.comment-id').val();
-    
 
-  
     if (confirm("삭제하시겠습니까?")) {
         
         $.ajax({

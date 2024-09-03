@@ -14,11 +14,11 @@ public class BoardDto {
 	
 	private int MEMBERID;
 	
-	@NotBlank
+	@NotBlank(message="게시판 제목은 필수 입력 값입니다.")
 	private String TITLE;
 
 	
-	@NotBlank
+	@NotBlank(message="게시판 내용은 필수 입력 값입니다.")
 	private String CONTENT;
 	
 

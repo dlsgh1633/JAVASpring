@@ -137,7 +137,28 @@ public class MemberDto {
 	public void setMODIFY_DATE(Date mODIFY_DATE) {
 		MODIFY_DATE = mODIFY_DATE;
 	}
+	public MemberDto() {}
+	
+	public MemberDto(String nAME, String eMAIL, String pASSWORD, String tEL, String aDDR, String aDDR_DETAIL,
+			String sTREETNUM, String pS, Date rEG_DATE, Date mODIFY_DATE) {
+		super();
+		
+		NAME = nAME;
+		EMAIL = eMAIL;
+		PASSWORD = pASSWORD;
+		TEL = tEL;
+		ADDR = aDDR;
+		ADDR_DETAIL = aDDR_DETAIL;
+		STREETNUM = sTREETNUM;
+		PS = pS;
+		
+		this.REG_DATE = new Date(System.currentTimeMillis());
+		MODIFY_DATE = mODIFY_DATE;
+	}
 
+	
+	
+	
 	public MemberDto(String nAME, String eMAIL, String pASSWORD, String tEL, String aDDR, String aDDR_DETAIL,
 			String sTREETNUM, String pS, Date rEG_DATE, Date mODIFY_DATE, int mEMBERID) {
 		super();

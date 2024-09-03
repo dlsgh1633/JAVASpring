@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +69,7 @@ public class CommentsController {
 	}
 
 	@PostMapping("/comment/post")
-	public ResponseEntity<CommentDto> postComments(@RequestParam String content, @RequestParam int boardId) {
+	public ResponseEntity<CommentDto> postComments(@RequestParam @Valid String content, @RequestParam int boardId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 		CommentDto commentDto = new CommentDto();
@@ -83,7 +85,7 @@ public class CommentsController {
 	}
 
 	@PostMapping("/reply/post")
-	public ResponseEntity<CommentDto> postReplys(@RequestParam String content, @RequestParam int boardId,
+	public ResponseEntity<CommentDto> postReplys(@RequestParam @Valid String content, @RequestParam int boardId,
 			@RequestParam(value = "parentsId") int parentsId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -102,7 +104,7 @@ public class CommentsController {
 
 	@PostMapping("/comment/modify")
 	public ResponseEntity<CommentDto> modifyComment(@RequestParam(value = "commentId") int commentId,
-			@RequestParam(value = "content") String content, Pageable pageable) {
+			@RequestParam(value = "content") @Valid String content, Pageable pageable) {
 		CommentDto commentDto = new CommentDto();
 		commentDto.setCOMMENTID(commentId);
 		commentDto.setCONTENT(content);

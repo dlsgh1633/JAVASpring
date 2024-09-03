@@ -2,11 +2,14 @@ package com.example.demo.model;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotBlank;
+
 
 public class CommentDto {
 	private int COMMENTID;
 	private int BOARDID;
 	private int MEMBERID;
+	@NotBlank(message = "댓글의 내용은 필수 입력 값입니다.")
 	private String CONTENT;
 	private Date REG_DATE;
 	private Date MODIFY_DATE;
