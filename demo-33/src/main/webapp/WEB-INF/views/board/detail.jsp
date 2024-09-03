@@ -165,7 +165,7 @@ function commentListload(){
 		       const padding = comment.level * 12+'px';
 		       const commentOwner = comment.commentid;
 		       const boardOwner = comment.boardid;
-		       
+		       const deleteCheck = comment.comment_DELETE;
 		       const commentFormat = CommentDate(comment.reg_DATE); 
 		       
 			   let commentHTML = 
@@ -179,13 +179,13 @@ function commentListload(){
 	                    "</div>" +
 	                    "<div class='commentHead2'>"; 
 	                    
-						if(comment.userNullcheck){
+						if(deleteCheck === 0 && comment.userNullcheck ){
 							commentHTML +=
 							"<div class='commentReply' id='reply'>답글</div>"
 						}
 	                    
 	                    
-	                    if (comment.writer) {
+	                    if (comment.writer && deleteCheck === 0) {
 	                        commentHTML +=
 	                            "<div class='commentModify'>수정</div>" +
 	                            "<div class='commentRemove'>삭제</div>";
@@ -329,8 +329,7 @@ $('#commentDiv').on('click',".commentModify",function(){
     }
     
     commentDiv.find('.comment').empty().append(`
-    		
-    		
+ 
             <textarea class="form-control edit-textarea modfiyComment" rows="3" ></textarea>
             <button type="button" class="btn btn-primary btn ml-1 modifybutton" >수정</button>
             
