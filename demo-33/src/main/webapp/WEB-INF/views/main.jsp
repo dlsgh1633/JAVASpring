@@ -2,6 +2,8 @@
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <!DOCTYPE html>
 <html>
 <%@ include file="/WEB-INF/views/module/header.jsp"%>
@@ -51,7 +53,10 @@
 												</td>
 												<td>
 													<a href='/board/detail?boardId=<c:out value="${list.BOARDID}"/>'>
-														<c:out value="${list.TITLE}" />
+
+														<c:out value="${fn:replace(list.TITLE, ' ', '&nbsp;')}" escapeXml="false" />
+
+
 													</a>
 												</td>
 												<td>

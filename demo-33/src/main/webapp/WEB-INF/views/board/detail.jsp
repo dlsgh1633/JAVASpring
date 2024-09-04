@@ -28,7 +28,7 @@
 							<!-- Basic Card Example -->
 							<div class="card shadow mb-4 h-100">
 								<div class="card-header py-3">
-									<h6 class="m-0 font-weight-bold text-primary btn float-left">${boardcheck.TITLE}</h6>
+									<h6 class="m-0 font-weight-bold text-primary btn float-left" style="white-space: pre-wrap;" >${boardcheck.TITLE}</h6>
 									<input type="hidden" name="memberId" value="${boardcheck.MEMBERID}">
 									<c:choose>
 										<c:when test="${not empty pageContext.request.userPrincipal}">
@@ -42,7 +42,7 @@
 										</c:when>
 									</c:choose>
 								</div>
-								<div class="card-body navbar-nav-scroll" style="height: 290px !important">${boardcheck.CONTENT}</div>
+								<div class="card-body navbar-nav-scroll" style="height: 290px !important; white-space: pre-wrap;">${boardcheck.CONTENT}</div>
 								<div class="card-body fileUpLoad">
 									<label class="fileUpLoadBtn"></label>
 									<div id="fileName" class="fileName">
@@ -134,7 +134,7 @@ function CommentDate (comment){
      let hours = ('0' + today.getHours()).slice(-2);
      let minutes = ('0' + today.getMinutes()).slice(-2);
      let seconds = ('0' + today.getSeconds()).slice(-2); 
-
+	
      return year + '-' + month + '-' + day +' '+ hours + ":" + minutes + ':' + seconds ;
 }
 
@@ -260,7 +260,6 @@ $('#commentbutton').on('click',function(){
 	}
 	
 	
-	
 	$.ajax({
 		url: "/comment/post",
 		type: "POST",
@@ -289,54 +288,93 @@ $('#commentDiv').on('click',".commentReply", function() {
 	let parentId = $(this).closest('.commentDiv').find('.comment-id').val();
     let commentLi = $(this).closest('li');
     let writeName = $(this).closest('.commentDiv').find('.commentName').text();
-    console.log( "writeName 왜 안나오노"+writeName);
-   
-  
+    let existingModifyForm = $('.modify-form');
+    
+    if (existingModifyForm.length > 0) {
+        
+        existingModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
+        existingModifyForm.remove(); 
+        
+    }
+
     if (commentLi.next().hasClass('reply-form')) {
         commentLi.next().remove();
         return;
     }
+
     
-    let replyForm = `
-        <li class="reply-form" style="padding-left: 4rem;">
-            <form class="flex reply-form">
-            	<c:out value="${list.MEMBER_NAME}"/>
-                <textarea cols="30" rows="3" class="form-control flex replytext" style="width: 90%" placeholder="대댓글을 입력하세요"></textarea>
-                <button type="button" class="btn btn-primary btn ml-1 replysubmit" style="margin-top: 0.75rem; width: 9%">등록</button>
-            </form>
-        </li>
-    `;
+    $('.reply-form').remove();
+
     
-	
+    let replyForm = 
+        "<li class='reply-form' style='padding-left: 4rem;'>"+
+            "<form class='flex reply-form'>"+
+                "<textarea cols='30' rows='3' class='form-control flex replytext' style='width: 90%' placeholder='대댓글을 입력하세요'></textarea>"+
+                "<button type='button' class='btn btn-primary btn ml-1 replysubmit' style='margin-top: 0.75rem; width: 9%'>등록</button>"+
+           " </form>"+
+        "</li>";
     
-    commentLi.after(replyForm);
+        commentLi.after(replyForm);
+        
+        
+	lengthtest = "@" + writeName+" ";
+	console.log("길이 체크" + lengthtest.length);
+  
     $('.replytext').val("@" + writeName+" ");
     $('.replytext').focus();
+    
+    $('.replytext').on('keydown',function(){
+    	if($('.replytext').val().length < lengthtest.length){
+    		$('.replytext').val(lengthtest);
+    		return;
+    	}
+    	
+    });
+    
 });
 
+let originalCommentContent = "";
 // 대댓글 수정
 $('#commentDiv').on('click',".commentModify",function(){
-	 let commentDiv = $(this).closest('.commentDiv');
+	let commentDiv = $(this).closest('.commentDiv');
 	let parentId = $(this).closest('.commentDiv').find('.comment-id').val();
     let commentLi = $(this).closest('.li');
     let modifyReply = $(this).closest('.commentDiv').find('.comment p').text();
-    console.log("수정버튼 들어왔나요 ? " +modifyReply);
-	
-	
-    if (commentLi.next().hasClass('reply-form')) {
-        commentLi.next().remove();
+    let modifyBackUp = $(this).closest('.commentDiv').find('.comment p').text();   
+    let existingModifyForm = $('.modify-form');
+    let existingReplyForm = $('.reply-form');
+    let clickModifyForm = commentDiv.find('.modify-form');
+    
+    if (existingModifyForm.length > 0) {
+      
+        existingModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
+        existingModifyForm.remove(); 
+        
+    }
+    if (clickModifyForm.length > 0) {
+        
+    	clickModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
+    	clickModifyForm.remove(); 
         return;
     }
     
-    commentDiv.find('.comment').empty().append(`
- 
-            <textarea class="form-control edit-textarea modfiyComment" rows="3" ></textarea>
-            <button type="button" class="btn btn-primary btn ml-1 modifybutton" >수정</button>
-            
-        `);
+    if(existingReplyForm.length > 0){
+    	existingReplyForm.remove();
+    }
     
-   $('.modfiyComment').val(modifyReply);
-   $('.modfiyComment').focus();
+ 
+    originalCommentContent = modifyReply;  
+
+    let modifyForm = 
+      "<div class='modify-form'>" +
+        "<textarea class='form-control edit-textarea modfiyComment' rows='3'>" + modifyReply + "</textarea>" +
+        "<button type='button' class='btn btn-primary btn ml-1 modifybutton modfiyComment'>수정</button>" +
+      "</div>";
+    
+ 	
+    
+        commentDiv.find('.comment').empty().append(modifyForm);
+ 	    $('.modfiyComment').focus();
     
 
 });
@@ -348,9 +386,9 @@ $('#replyForm').on('click',".replysubmit", function(){
 	 let boardId = ${boardcheck.BOARDID};
 	 let content = $(this).closest('.reply-form').find('.replytext').val().trim();
 	
-	console.log("부모댓글 ID " +parentId);
-	console.log("대댓글 게시판 ID :" + boardId);
-	console.log("대댓글 내용  :" + content);
+	 console.log("부모댓글 ID " +parentId);
+	 console.log("대댓글 게시판 ID :" + boardId);
+	 console.log("대댓글 내용  :" + content);
 	
 		if(content === ''){
 			alert("내용을 입력해주세요");

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
 <%@ include file="/WEB-INF/views/module/header.jsp"%>
@@ -30,13 +31,13 @@
 								<div class="card shadow mb-4 h-100">
 									<div class="card-header py-3">
 										<div class="col-sm-11 float-left">
-											<input type="text" id="TITLE" name="TITLE" class="form-control" placeholder="제목" maxlength="20">
+											<input type="text" id="TITLE" name="TITLE" class="form-control" style="white-space: pre-wrap;"  placeholder="제목" maxlength="20">
 										</div>
 
 										<button type="button" id="boardSubmit" class="btn btn-primary btn float-right ml-1">작성완료</button>
 									</div>
 									<div class="card-body h-100">
-										<textarea id="CONTENT" name="CONTENT" cols="30" class="form-control h-100" placeholder="내용
+										<textarea id="CONTENT" name="CONTENT" cols="30" class="form-control h-100" style="white-space: pre-wrap;" placeholder="내용
                         " style="resize: none" onKeyup="len_chk()"></textarea>
 									</div>
 
