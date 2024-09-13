@@ -38,7 +38,7 @@
 									</div>
 									<div class="card-body h-100">
 										<textarea id="CONTENT" name="CONTENT" cols="30" class="form-control h-100" placeholder="내용
-                      					  " style="resize: none" onKeyup="len_chk()">${boardmodify.CONTENT}</textarea>
+                      					  " style="resize: none">${boardmodify.CONTENT}</textarea>
 
 									</div>
 									<div class="file_list">
@@ -47,7 +47,7 @@
 											<c:if test="${empty fileList}">
 												<div class="file_input">
 													<input type="text" readonly />
-													<input type="file" name="files" id="files" onchange="selectFile(this);" multiple>
+													<input type="file" name="files" id="files" onchange="file.selectFile(this);" multiple>
 
 												</div>
 
@@ -57,16 +57,16 @@
 												<div class="file_input">
 													<input type="text" name="files" value="${FileList.ORG_FILE_NAME}" readonly />
 													<input type="hidden" id="UUID" name="UUID" value="${FileList.FILE_NAME}">
-													<input type="file" name="files" id="files" onchange="selectFile(this);" data-uuid="${FileList.FILE_NAME}" multiple>
+													<input type="file" name="files" id="files" onchange="file.selectFile(this);" data-uuid="${FileList.FILE_NAME}" multiple>
 
 												</div>
-												<button type="button" onclick="removeFile(this);" class="btns del_btn" data-uuid="${FileList.FILE_NAME}">
+												<button type="button" onclick="file.removeFile(this);" class="btns del_btn" data-uuid="${FileList.FILE_NAME}">
 													<span>삭제</span>
 												</button>
 
 
 											</c:forEach>
-											<button type="button" onclick="addFile();" class="btns fn_add_btn">
+											<button type="button" onclick="file.addFile();" class="btns fn_add_btn">
 												<span>파일 추가</span>
 											</button>
 										</div>
@@ -111,14 +111,18 @@
 
 	<!-- Page level custom scripts -->
 	<script src="/resources/js/demo/datatables-demo.js"></script>
-
+	<script src="/resources/js/demo/datatables-demo.js"></script>
+	<script src="/resources/functionJS/ajax.js"></script>
+	<script src="/resources/functionJS/global.js"></script>
+	<script src="/resources/functionJS/validate.js"></script>
 </body>
 <script type="text/javascript">
+const UUIDs = [];
 $('#submitModify').on('click', function() {
 	
-	   var title = $('#TITLE').val().trim(); 
-	   var content = $('#CONTENT').val().trim(); 
-	   var formdata = new FormData();
+	let title = $('#TITLE').val().trim(); 
+	let content = $('#CONTENT').val().trim(); 
+	let formdata = new FormData();
 		
 	   
 	   if(title === ''){
@@ -129,21 +133,15 @@ $('#submitModify').on('click', function() {
 	    	alert("내용은 필수사항입니다.");
 	    	return false;
 	    }
-	    
-	   
-	   
-	   
-	   $('input[type="file"][name="files"]').each(function() {
-	        var files = $(this)[0].files;
+   
+	   $('input[type="file"][name="files"]').each(function(){
+		   let files = $(this)[0].files;
 	        for (var i = 0; i < files.length; i++) {
 	            formdata.append("files", files[i]);
 	            console.log("파일 수정 들어왔냐?:", files[i].name); 
-	         
-	            
 	        }
 	    });
-	
-	  
+		  
 	    formdata.append("BOARDID", $('#BOARDID').val());
 	    formdata.append("TITLE", $('#TITLE').val());
 	    formdata.append("CONTENT", $('#CONTENT').val());
@@ -151,110 +149,28 @@ $('#submitModify').on('click', function() {
 		formdata.append("FILE_NAME", UUIDs);
 	
  if (confirm("게시글을 수정 하시겠습니까?")) {
-     $.ajax({
-         url: "/board/postmodify",
-         type: "POST",
-         data: formdata,
-         enctype: 'multipart/form-data',
-         processData: false,
-         contentType : false,
-         success: function(response) {
-             alert("수정이 완료되었습니다");
-             window.location.href = "/main";
-         },
-		 error : function(request,status,error){
-			 alert("에러가 발생했습니다.");
-			 window.location.href ="/error/error";
-		 }
-     	
-     });
+     ajax.filepost('/board/postmodify',formdata)
+     .then(function(response){
+    	 alertMessage('수정이 완료되었습니다');
+    	 window.location.href = "/main";
+     })
+     .catch(function(error){
+    	alertMessage('에러가 발생했습니다');
+    	window.location.href ="/error/error";
+     })
  } else {
-     alert("수정을 취소하였습니다");
+     alertMessage("수정을 취소하였습니다");
      return false;
  }
 });
 
 
-function len_chk(){  
-	  var frm = document.insertFrm.CONTENT; 
-	    
-	  if(frm.value.length > 700){  
-	       alert("내용의 글자수는 700글자 미만으로 작성하여야합니다.");  
-	       frm.value = frm.value.substring(0,700);  
-	       return false;  
-	  } 
-	} 
-	
+$('#CONTENT').on('keyup',function(){
+	len_chk('CONTENT','내용의 글자수는 700글자 미만으로 작성하여야합니다.',700);		
+});
 
 
 
-
-function selectFile(element) {
-
-    const file = element.files[0];
-    const filename = element.closest('.file_input').firstElementChild;
-    let UUID = [];
-	UUID = element.getAttribute('data-uuid');
-	console.log("UUID 체크 : " + UUID);
-	UUIDs.push(UUID);
-	console.log('덮어쓰기 된 UUID는 ? ', UUIDs);
-   
-    if ( !file ) {
-        filename.value = '';
-        return false;
-    }
-
-   
-    const fileSize = Math.floor(file.size / 1024 / 1024);
-    if (fileSize > 10) {
-        alert('10MB 이하의 파일로 업로드해 주세요.');
-        filename.value = '';
-        element.value = '';
-        return false;
-    }
-
-   
-    filename.value = file.name;
-}
-
-
-
-function addFile() {
-   
-    
-    const fileDiv = document.createElement('div');
-  
-    fileDiv.innerHTML =`
-        <div class="file_input">
-            <input type="text" readonly />
-            <label> 첨부파일
-            	
-                <input type="file" name="files" onchange="selectFile(this);"  />
-              
-            </label>
-        </div>
-        <button type="button" onclick="removeFile(this);" class="btns del_btn" ><span>삭제</span></button>
-    `;
-    document.querySelector('.file_list').appendChild(fileDiv);
-   
-}
-
-const UUIDs = [];
-
-function removeFile(element) {
-    const fileAddBtn = element.nextElementSibling;
-    let UUID = [];
-    UUID = element.getAttribute('data-uuid');
-    UUIDs.push(UUID);
-    console.log('현재 삭제된 UUIDs:', UUIDs); 
-    if (fileAddBtn) {
-        const inputs = element.previousElementSibling.querySelectorAll('input');
-        inputs.forEach(input => input.value = '')
-        return false;
-    }
-    
-    element.parentElement.remove();
-}
 
 
 

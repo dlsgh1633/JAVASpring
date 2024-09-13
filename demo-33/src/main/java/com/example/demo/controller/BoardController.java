@@ -37,66 +37,33 @@ import com.example.demo.service.CommentsService;
 import com.example.demo.service.FileService;
 
 @Controller
-public class BoardController { 
+public class BoardController {
 
 	private final BoardService boardService;
-	private final FileUtis fileUtis;
+
 	private final FileService fileService;
-	private final CommentsService commentsService;
 
 	@Autowired
-	public BoardController(BoardService boardService, FileUtis fileUtis, FileService fileService,CommentsService commentsService) {
+	public BoardController(BoardService boardService, FileService fileService) {
 		this.boardService = boardService;
-		this.fileUtis = fileUtis;
 		this.fileService = fileService;
-		this.commentsService = commentsService;
+
 	}
 
+	// 작성 페이지 접속
 	@GetMapping("/board/write")
 	public String getWrite() {
 
 		return "board/write";
 	}
-	
-	
-	
-	
-	/*
-	 * 동기식 게시판 등록.
-	 * 
-	 * @PostMapping("/board/postwrite") public String postWrite(BoardDto boardDto) {
-	 * Authentication authentication =
-	 * SecurityContextHolder.getContext().getAuthentication(); CustomUserDetails
-	 * userDetails = (CustomUserDetails) authentication.getPrincipal();
-	 * System.out.println("게시판 등록 컨트롤러 진입");
-	 * boardDto.setMEMBERID(userDetails.getUserid());
-	 * boardService.RegisterBoard(boardDto);
-	 * 
-	 * return "/main"; }
-	 */ // 파일 업로드 진행
-		// 나중에 DTO 클래스를 이용해서 파일업로드시 -> 임시파일이 생성되는지 디버깅해서 알아보기
-		//트랜잭션 처리 ? 
+
 	@PostMapping("/board/postwrite")
 	public ResponseEntity<BoardDto> postWrite(@RequestParam("TITLE") @Valid String title,
 			@RequestParam("CONTENT") @Valid String content,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		System.out.println("작성시 files 정보 " + files);
-		BoardDto boardDto = new BoardDto();
-		boardDto.setTITLE(title);
-		boardDto.setCONTENT(content);
-		boardDto.setMEMBERID(userDetails.getUserid());
-		boardService.RegisterBoard(boardDto);
-		
-	 	
-		if (files != null && !files.isEmpty()) {
-			List<FileDto> uploadedFiles = fileUtis.uploadFiles(files);
-			System.out.println("Boardid는 등록이 되고나서 가져와진건가 ? " + boardDto.getBOARDID());
-			fileService.saveFiles(boardDto.getBOARDID(), uploadedFiles);
-		}
- 
+		BoardDto boardDto = boardService.RegisterBoard(title, content, files);
+
 		return ResponseEntity.ok(boardDto);
 	}
 
@@ -106,9 +73,7 @@ public class BoardController {
 		model.addAttribute("boardcheck", boardService.getboard(boardId));
 		model.addAttribute("fileList", fileService.fileList(boardId));
 		
-		System.out.println();
 		return "board/detail";
-
 	}
 
 	@GetMapping("/board/modify")
@@ -120,37 +85,15 @@ public class BoardController {
 		return "board/modify";
 	}
 
-	// UUID 리스트 테스트
+	// 게시판 수정
 	@PostMapping("/board/postmodify")
 	public ResponseEntity<BoardDto> postModify(@RequestParam("TITLE") @Valid String title,
-			@RequestParam("CONTENT") @Valid String content,@RequestParam("BOARDID") int boardId,
+			@RequestParam("CONTENT") @Valid String content, @RequestParam("BOARDID") int boardId,
 			@RequestParam(value = "FILE_NAME", required = false) List<String> FILE_NAME,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
-	
-		System.out.println("파일즈 정보 나오냐 ?" + files);
-		System.out.println("UUID 정보 확인 " + FILE_NAME);
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		BoardDto boardDto = new BoardDto();
-		boardDto.setTITLE(title);
-		boardDto.setCONTENT(content);
-		boardDto.setMEMBERID(userDetails.getUserid());
-		boardDto.setBOARDID(boardId);
-		
-		
-		
-		boardService.updateBoard(boardDto);
-		
-		
-		if (files != null && !files.isEmpty()) {
-			List<FileDto> uploadedFiles = fileUtis.uploadFiles(files);
-			System.out.println("Modify의 업로드 로직 실행되었는가 ? ");
-			fileService.saveFiles(boardDto.getBOARDID(), uploadedFiles);
-		}
-		if(FILE_NAME != null && !FILE_NAME.isEmpty()) {
-			fileService.DeleteFlagByUUIDs(FILE_NAME);
-		}
-		
+
+		BoardDto boardDto = boardService.updateBoard(title, content, boardId, files, FILE_NAME);
+
 		return ResponseEntity.ok(boardDto);
 	}
 
@@ -158,14 +101,9 @@ public class BoardController {
 	public ResponseEntity<String> boardDelete(int boardId) {
 
 		boardService.deleteBoard(boardId);
-        fileService.boardDeleteFiles(boardId);
+		fileService.boardDeleteFiles(boardId);
 		return ResponseEntity.ok("success");
 
 	}
-	
-	
 
-	
-	
-	
 }

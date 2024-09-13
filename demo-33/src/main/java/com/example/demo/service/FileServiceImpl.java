@@ -19,10 +19,8 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public void saveFiles(int boardId, List<FileDto> files) {
 		for (FileDto file : files) {
-			System.out.println("boardid는?" + boardId);
-			System.out.println("savFiles에서 파일 수대로 반복하나요 ? " + file);
+
 			file.setBOARDID(boardId);
-			System.out.println("파일 db 저장시 boardId를 제대로 받았나요 ? " + file.getBOARDID());
 
 		}
 		fileMapper.insertFile(files);
@@ -30,25 +28,25 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public List<FileDto> fileList(int BoardId) {
-			
+
 		return fileMapper.fileList(BoardId);
 	}
-	
+
 	@Override
 	public FileDto findByUuid(String UUID) {
-		
+
 		return fileMapper.findByUUID(UUID);
 	}
-	
+
 	@Override
-	public int DeleteFlagByUUIDs (List<String> UUIDs){
-		
+	public int DeleteFlagByUUIDs(List<String> UUIDs) {
+
 		return fileMapper.updateDeleteFlagByUUIDs(UUIDs);
 	}
-	
+
 	@Override
-	public int boardDeleteFiles (int boardId) {
-		
+	public int boardDeleteFiles(int boardId) {
+
 		return fileMapper.boardDeleteFile(boardId);
 	}
 

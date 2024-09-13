@@ -12,9 +12,7 @@ public class PageDto {
 	private int nowPage;
 	private int cntPage = 10;
 	
-	
-	
-	
+
 	public PageDto () {}
 	
 	public PageDto(int total,int nowPage, int cntPerPage) {

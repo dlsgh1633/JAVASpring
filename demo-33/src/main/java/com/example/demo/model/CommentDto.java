@@ -24,6 +24,7 @@ public class CommentDto {
 	public boolean isUserNullcheck() {
 		return UserNullcheck;
 	}
+	
 	public void setUserNullcheck(boolean userNullcheck) {
 		UserNullcheck = userNullcheck;
 	}

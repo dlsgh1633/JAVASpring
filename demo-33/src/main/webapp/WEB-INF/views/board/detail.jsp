@@ -28,7 +28,7 @@
 							<!-- Basic Card Example -->
 							<div class="card shadow mb-4 h-100">
 								<div class="card-header py-3">
-									<h6 class="m-0 font-weight-bold text-primary btn float-left" style="white-space: pre-wrap;" >${boardcheck.TITLE}</h6>
+									<h6 class="m-0 font-weight-bold text-primary btn float-left" style="white-space: pre-wrap;">${boardcheck.TITLE}</h6>
 									<input type="hidden" name="memberId" value="${boardcheck.MEMBERID}">
 									<c:choose>
 										<c:when test="${not empty pageContext.request.userPrincipal}">
@@ -72,7 +72,7 @@
 											<textarea id="a3" cols="30" row="5" class="form-control flex" style="width: 90%" placeholder="내용">   
 										</textarea>
 											<a class="commentAdd flex" style="width: 9%">
-												<button type="button" id="commentbutton" class="btn btn-primary btn ml-1" style="margin-top: 0.75rem; width: 100%">등록</button>
+												<button type="button" id="commentbutton" class="btn btn-primary btn ml-1" style="margin-top: 0.75rem; width: 100%" >등록</button>
 											</a>
 										</form>
 									</c:if>
@@ -115,30 +115,18 @@
 
 	<!-- Page level custom scripts -->
 	<script src="/resources/js/demo/datatables-demo.js"></script>
-
-
+	<script src="/resources/functionJS/ajax.js"></script>
+	<script src="/resources/functionJS/global.js"></script>
+	<script src="/resources/functionJS/validate.js"></script>
+	
 </body>
 <script type="text/javascript">
 $(document).ready(function(){
 	
 	commentListload();
 	$('#a3').val('');
-	
+		
 });
-
-function CommentDate (comment){
-	 let today = new Date(comment);
-     let year =  today.getFullYear();
-     let month = ('0'+(today.getMonth()+1)).slice(-2);
-     let day = ('0' + today.getDate()).slice(-2);
-     let hours = ('0' + today.getHours()).slice(-2);
-     let minutes = ('0' + today.getMinutes()).slice(-2);
-     let seconds = ('0' + today.getSeconds()).slice(-2); 
-	
-     return year + '-' + month + '-' + day +' '+ hours + ":" + minutes + ':' + seconds ;
-}
-
-
 
 //댓글 및 대댓글 불러오기
 function commentListload(){
@@ -148,153 +136,142 @@ function commentListload(){
 	console.log(memberId);
 	const commentDiv = $("#commentDiv");
 	commentDiv.empty();
-	
-	$.ajax({
-		url: "/board/detail/comment",
-		type: "GET" ,
-		dataType: "JSON",
-		data : 
-		{
-			 boardId : boardId,
-			 memberId : memberId
-		},	
-		success : function(response){
-			 response.forEach(function(comment) {
-		       console.log(comment);
-	       
-		       const padding = comment.level * 12+'px';
-		       const commentOwner = comment.commentid;
-		       const boardOwner = comment.boardid;
-		       const deleteCheck = comment.comment_DELETE;
-		       const commentFormat = CommentDate(comment.reg_DATE); 
-		       
-			   let commentHTML = 
-				     "<li >" +
-	                    "<div class='commentDiv' style='padding-left:"+ padding+" '>" +
-	                    "<input type='hidden' class='comment-id' value='" + comment.commentid + "'>" +
-	                    "<div class='commentHead'>" +
-	                    "<div class='commentHead1'>" +
-	                    "<div class='commentName write-name'>" + comment.name + "</div>" +
-	                    "<div class='commentDate'>" + commentFormat + "</div>" +
-	                    "</div>" +
-	                    "<div class='commentHead2'>"; 
-	                    
-						if(deleteCheck === 0 && comment.userNullcheck ){
-							commentHTML +=
-							"<div class='commentReply' id='reply'>답글</div>"
-						}
-	                    
-	                    
-	                    if (comment.writer && deleteCheck === 0) {
-	                        commentHTML +=
-	                            "<div class='commentModify'>수정</div>" +
-	                            "<div class='commentRemove'>삭제</div>";
-	                    }
-	                    
-	                    commentHTML +=
-	                   
-	                    "<div class='commentCancle' style='display:none;'>취소</div>" +
-	                    "</div>" +
-	                    "</div>" +
-	                    "<div class='comment'>" ;
-	                    
-	                    if(comment.comment_DELETE != 1){
-	                    commentHTML += 
-	                    "<p>" + comment.content + "</p>";
-	                    }
-	                    else{
-	                    	  commentHTML += 
-	      	                    "<p>삭제되었습니다.</p>";
-	                    }
-	                    
-	                    commentHTML += 
-	                    "</div>" +
-	                    "</div>" +
-	                    "<hr class='sidebar-divider d-none d-md-block'>" +
-	                    "</li>";	 
+
+	ajax.get('/board/detail/comment',{boardId : boardId, memberId : memberId})
+	.then(function(response){
+		 response.forEach(function(comment) {
+		        const padding = comment.level * 12 + 'px';
+				const commentOwner = comment.commentid;
+				const boardOwner = comment.boardid;
+				const deleteCheck = comment.comment_DELETE;
+				const commentFormat = dateFunc(comment.reg_DATE);
+				
+				let commentHTML =
+					"<li >" +
+					"<div class='commentDiv' style='padding-left:" + padding + " '>" +
+					"<input type='hidden' class='comment-id' value='" + comment.commentid + "'>" +
+					"<div class='commentHead'>" +
+					"<div class='commentHead1'>" +
+					"<div class='commentName write-name'>" + comment.name + "</div>" +
+					"<div class='commentDate'>" + commentFormat + "</div>" +
+					"</div>" +
+					"<div class='commentHead2'>";
+
+				if (deleteCheck === 0 && comment.userNullcheck) {
+					commentHTML +=
+						"<div class='commentReply' id='reply'>답글</div>"
+				}
+
+
+				if (comment.writer && deleteCheck === 0) {
+					commentHTML +=
+						"<div class='commentModify'>수정</div>" +
+						"<div class='commentRemove'>삭제</div>";
+				}
+
+				commentHTML +=
+
+					"<div class='commentCancle' style='display:none;'>취소</div>" +
+					"</div>" +
+					"</div>" +
+					"<div class='comment'>";
+
+				if (comment.comment_DELETE != 1) {
+					commentHTML +=
+						"<p>" + comment.content + "</p>";
+				}
+				else {
+					commentHTML +=
+						"<p>삭제되었습니다.</p>";
+				}
+
+				commentHTML +=
+					"</div>" +
+					"</div>" +
+					"<hr class='sidebar-divider d-none d-md-block'>" +
+					"</li>";  
+		     
+			                    
 					$('#commentDiv').append(commentHTML);  
-	            });
-		}
-	});
+	            })
+	})
+	.catch(function(error){
+		alertMessage('에러가 발생하였습니다');
+		console.log(error);
+	})
 }
 
 //게시판 삭제
-$('#deleteButton').on('click', function() {
-	
+$('#deleteButton').on('click', function() {	
 	boardId = ${boardcheck.BOARDID};
-	console.log("삭제를 위한 boardId는? " + boardId);
 	
 if (confirm("게시글을 삭제 하시겠습니까?")) {
-  $.ajax({
-      url: "/board/delete",
-      type: "POST",
-      data: {
-    	  boardId : boardId
-      },
-      success: function(response) {
-          alert("삭제가 완료되었습니다");
-          window.location.href = "/main";
-      },
-		 error : function(request,status,error){
-			 alert("에러가 발생했습니다.");
-			 window.location.href ="/error/error";
-		 }
-  	
-  });
+
+ ajax.post('/board/delete',{boardId : boardId})
+ .then(function(){
+	 alertMessage("삭제가 완료되었습니다");
+     window.location.href = "/main";
+ })
+ .catch(function(){
+	 alertMessage("에러가 발생했습니다.");
+	 window.location.href ="/error/error";
+ })
 } else {
-  alert("게시글 삭제를 취소하였습니다");
+  alertMessage("게시글 삭제를 취소하였습니다");
   return false;
 }
 });
 
 //댓글 등록
-$('#commentbutton').on('click',function(){
-	boardId = ${boardcheck.BOARDID};
-	content = $('#a3').val().trim();
-	console.log("등록버튼 안눌림 ?"+boardId);
-	
+// onclick 펑션으로 ?
+//이벤트위임 
+function commentRegister() {
+    let boardId = ${boardcheck.BOARDID};
+    let parentId = 0;
+    let content = '';
+    let writeName = $(this).closest('.commentDiv').find('.commentName').text();
+    if ($(this).hasClass('replysubmit')) {
+        // 대댓글 등록
+        parentId = $(this).closest('li').prev('li').find('.comment-id').val();
+        content = $(this).closest('.reply-form').find('.replytext').val().trim();
+        console.log('대댓글 등록 실행');
+    } else {
+        // 일반 댓글 등록
+        content = $('#a3').val().trim();
+    }
 
-	if(content === ''){
-		alert("내용을 입력해주세요.");
-		return false;
-	}
-	
-	
-	$.ajax({
-		url: "/comment/post",
-		type: "POST",
-		data:
-		{
-				content : content,
-				boardId : boardId
-		},
-		success: function(response){
-			alert("댓글을 등록하였습니다.");
-			commentListload();
-			$('#a3').val('');
+    if (content === '') {
+    	console.log('실행됨');
+        alertMessage('내용을 입력해주세요.');
+        return;
+    }
 
-		},
-		 error : function(request,status,error){
-			 alert("에러가 발생했습니다.");
-			 window.location.href ="/error/error";
-		 }	
-	
-	});
-	
-});
+    ajax.post('/comment/post', {content: content, boardId: boardId, parentsId: parentId})
+        .then(function(response){
+            alertMessage('댓글을 등록하였습니다');
+            commentListload();
+            $('#a3').val('');
+            $('.replytext').val('');
+        })
+        .catch(function(error){
+            alertMessage('에러가 발생했습니다');
+            window.location.href = "/error/error";
+        });
+}
+
+$(document).on('click', '#commentbutton', commentRegister);
+$(document).on('click', '.replysubmit', commentRegister);
 
 //대댓글 입력폼
 $('#commentDiv').on('click',".commentReply", function() {
 	let parentId = $(this).closest('.commentDiv').find('.comment-id').val();
     let commentLi = $(this).closest('li');
     let writeName = $(this).closest('.commentDiv').find('.commentName').text();
-    let existingModifyForm = $('.modify-form');
+    let ModifyForm = $('.modify-form');
     
-    if (existingModifyForm.length > 0) {
-        
-        existingModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
-        existingModifyForm.remove(); 
-        
+    if (ModifyForm.length > 0) {        
+        ModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
+        ModifyForm.remove();         
     }
 
     if (commentLi.next().hasClass('reply-form')) {
@@ -304,13 +281,12 @@ $('#commentDiv').on('click',".commentReply", function() {
 
     
     $('.reply-form').remove();
-
     
     let replyForm = 
         "<li class='reply-form' style='padding-left: 4rem;'>"+
             "<form class='flex reply-form'>"+
                 "<textarea cols='30' rows='3' class='form-control flex replytext' style='width: 90%' placeholder='대댓글을 입력하세요'></textarea>"+
-                "<button type='button' class='btn btn-primary btn ml-1 replysubmit' style='margin-top: 0.75rem; width: 9%'>등록</button>"+
+                "<button type='button' class='btn btn-primary btn ml-1 replysubmit' style='margin-top: 0.75rem; width: 9%' >등록</button>"+
            " </form>"+
         "</li>";
     
@@ -320,17 +296,15 @@ $('#commentDiv').on('click',".commentReply", function() {
 	lengthtest = "@" + writeName+" ";
 	console.log("길이 체크" + lengthtest.length);
   
-    $('.replytext').val("@" + writeName+" ");
+    $('.replytext').val("@" + writeName+" "); 
     $('.replytext').focus();
     
     $('.replytext').on('keydown',function(){
     	if($('.replytext').val().length < lengthtest.length){
     		$('.replytext').val(lengthtest);
     		return;
-    	}
-    	
-    });
-    
+    	}  	
+    });    
 });
 
 let originalCommentContent = "";
@@ -341,14 +315,14 @@ $('#commentDiv').on('click',".commentModify",function(){
     let commentLi = $(this).closest('.li');
     let modifyReply = $(this).closest('.commentDiv').find('.comment p').text();
     let modifyBackUp = $(this).closest('.commentDiv').find('.comment p').text();   
-    let existingModifyForm = $('.modify-form');
-    let existingReplyForm = $('.reply-form');
+    let ModifyForm = $('.modify-form');
+    let ReplyForm = $('.reply-form');
     let clickModifyForm = commentDiv.find('.modify-form');
     
-    if (existingModifyForm.length > 0) {
+    if (ModifyForm.length > 0) {
       
-        existingModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
-        existingModifyForm.remove(); 
+    	ModifyForm.closest('.comment').html("<p>" + originalCommentContent + "</p>");
+    	ModifyForm.remove(); 
         
     }
     if (clickModifyForm.length > 0) {
@@ -358,8 +332,8 @@ $('#commentDiv').on('click',".commentModify",function(){
         return;
     }
     
-    if(existingReplyForm.length > 0){
-    	existingReplyForm.remove();
+    if(ReplyForm.length > 0){
+    	ReplyForm.remove();
     }
     
  
@@ -371,51 +345,10 @@ $('#commentDiv').on('click',".commentModify",function(){
         "<button type='button' class='btn btn-primary btn ml-1 modifybutton modfiyComment'>수정</button>" +
       "</div>";
     
- 	
-    
+ 
         commentDiv.find('.comment').empty().append(modifyForm);
  	    $('.modfiyComment').focus();
     
-
-});
-
-
-//대댓글 등록
-$('#replyForm').on('click',".replysubmit", function(){
-	 let parentId = $(this).closest('li').prev('li').find('.comment-id').val();
-	 let boardId = ${boardcheck.BOARDID};
-	 let content = $(this).closest('.reply-form').find('.replytext').val().trim();
-	
-	 console.log("부모댓글 ID " +parentId);
-	 console.log("대댓글 게시판 ID :" + boardId);
-	 console.log("대댓글 내용  :" + content);
-	
-		if(content === ''){
-			alert("내용을 입력해주세요");
-			return false;
-		}
-	
-	   $.ajax({
-			url: "/reply/post",
-			type: "POST",
-			data:
-			{
-					content : content,
-					boardId : boardId,
-					parentsId : parentId
-			},
-			success: function(response){
-				alert("대댓글을 등록하였습니다.");
-				
-				commentListload();
-				$('.replytext').val('');
-				
-			},
-			 error : function(request,status,error){
-				 alert("에러가 발생했습니다.");
-				 window.location.href ="/error/error";
-			 }	
-		});
 });
 
 // 댓글 수정
@@ -425,28 +358,20 @@ $('#commentDiv').on('click',".modifybutton",function(){
 	let content = $(this).closest('.commentDiv').find('.modfiyComment').val().trim();
 	
 	if(content === ''){
-		alert("내용을 입력해주세요.");
+		alertMessage("내용을 입력해주세요.");
 		return false;
 	}
 	
-	$.ajax({
-		 url: "/comment/modify",
-		 type: "POST",
-		 data : 
-			 {
-			    commentId : commentId,
-			    content : content 
-			 },
-		 success: function(response){
-			 alert("수정이 완료되었습니다");
-			 commentListload();
-			 $('.modfiyComment').val();
-		 },
-		 error : function(request,status,error){
-			 alert("에러가 발생했습니다.");
-			 window.location.href ="/error/error";
-		 }
-	});	
+	ajax.post('/comment/modify',{commentId : commentId, content : content})
+	.then((response)=>{
+		 alertMessage("수정이 완료되었습니다");
+		 commentListload();
+		 $('.modfiyComment').val();
+	})
+	.catch((error)=>{
+		 alertMessage("에러가 발생했습니다.");
+		 window.location.href ="/error/error";
+	})
 });
 
 
@@ -454,31 +379,20 @@ $('#commentDiv').on('click',".modifybutton",function(){
 $('#commentDiv').on('click', ".commentRemove", function() {
     let deleteId = $(this).closest('.commentDiv').find('.comment-id').val();
 
-    if (confirm("삭제하시겠습니까?")) {
-        
-        $.ajax({
-            url: "/comment/delete",
-            type: "POST",
-            data: {
-                commentId: deleteId,
-                
-            },
-            success: function(response) {
-            	alert("해당 댓글을 삭제하였습니다.");
-                commentListload();
-            },
-            error: function(request, status, error) {
-                alert("에러가 발생했습니다.");
-                window.location.href = "/error/error";
-            }
-        });
+    if (confirm("삭제하시겠습니까?")) {  
+     ajax.post('/comment/delete',{commentId : deleteId})
+     .then((response)=>{
+    	 alertMessage("해당 댓글을 삭제하였습니다.");
+         commentListload();
+     })
+     .catch((error)=>{
+    	  alertMessage("에러가 발생했습니다.");
+          window.location.href = "/error/error";
+     })   
     } else {
         console.log("삭제가 취소되었습니다.");
     }
 });
-
-
-
 
 </script>
 </html>

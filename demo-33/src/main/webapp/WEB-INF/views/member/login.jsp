@@ -70,73 +70,43 @@
 
 	<!-- Custom scripts for all pages-->
 	<script src="/resources/js/sb-admin-2.min.js"></script>
-
+	<script src="/resources/functionJS/ajax.js"></script>
+	<script src="/resources/functionJS/global.js"></script>
+	<script src="/resources/functionJS/validate.js"></script>
 </body>
 <script type="text/javascript">
 	$(document).ready(function() {
-
-		$("#email").on('input', function(event) {
-			const regexp = /[^a-zA-Z0-9_@.]/g;
-
-			const emailvalue = $(this).val();
-
-			if (regexp.test(emailvalue)) {
-
-				alert("영어, 특수문자, 숫자 ( _ , @)만 입력 가능합니다.");
-
-				$(this).val(emailvalue.replace(regexp, ''));
-
-			}
-
-		});
-
-		if (localStorage.getItem("rememberEmail")) {
-			console.log("제발 기억해다오");
+		validate.validateInput('#email', 'input', validate.regex.emailInput, "영어, 특수문자, 숫자 ( _ , @)만 입력 가능합니다.");
+		
+		if(localStorage.getItem("rememberEmail")) {
 			$('#email').val(localStorage.getItem("rememberEmail"));
 			$('#rememberme').prop('checked', true);
-		}
-
+		}	
 		$('#loginsubmit').on('click', function(e) {
-
 			const email = $('#email').val();
 			const password = $('#password').val();
-
 			const rememberMe = $('#rememberme').is(':checked');
-			console.log(rememberMe);
-			console.log("이메일 입력값 : " + email);
 
 			if (rememberMe) { //true
 				localStorage.setItem("rememberEmail", email);
 			} else {
 				localStorage.removeItem("rememberEmail");
 			}
-
-			$.ajax({
-				url : "/member/logincheck",
-				type : "POST",
-				data : {
-					email : email,
-					password : password
-				},
-				dataType : "JSON",
-				//contentType: "application/json",
-				success : function(response) {
-					if (response.result === 'success') {
-						alert("로그인이 되었습니다.");
-						window.location.href = '/main';
-						console.log("스프링 ajax 성공 ~~~");
-					} else {
-						alert("이메일 및 비밀번호를 다시 확인해주세요.");
-						window.location.href = '/member/login';
-
-					}
-
-				},
-				error : function(xhr, status, error) {
-					alert("오류가 발생했습니다.");
+			ajax.post('/member/logincheck',{email:email, password:password})
+			.then(function(response){
+				if (response.result === 'success') {
+					alert("로그인이 되었습니다.");
+					window.location.href = '/main';
+					console.log("스프링 ajax 성공 ~~~");
+				} else {
+					alert("이메일 및 비밀번호를 다시 확인해주세요.");
 					window.location.href = '/member/login';
 				}
-			});
+			})
+			.catch(function(err){
+				alertMessage("오류가 발생했습니다.");
+				window.location.href = '/member/login';
+			})
 		});
 	});
 </script>

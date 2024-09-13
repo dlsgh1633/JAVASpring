@@ -33,10 +33,7 @@ public class FileApiController {
     	this.fileUtis =fileUtis;
     	this.fileService = fileService;
     }
-    
-    
-    
-    
+
 
     // 첨부파일 다운로드
     @GetMapping("/board/{boardId}/files/{UUID}/download")

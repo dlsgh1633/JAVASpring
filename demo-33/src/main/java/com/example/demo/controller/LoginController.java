@@ -21,40 +21,29 @@ import com.example.demo.service.MemberService;
 
 @Controller
 public class LoginController {
-	
+
 	private final MemberService memberService;
 	private final PasswordEncoder passwordEncoder;
-	
-	@Autowired
-	public LoginController (MemberService memberService , PasswordEncoder passwordEncoder) {
-		
-		this.memberService = memberService;
-		this.passwordEncoder =passwordEncoder;
-	}
-	
-	
-	
-	 @GetMapping("/member/login")
-	    public String getLogin() {
-		 
-	        return "member/login";
-	    }
-	 
-	 
-	
-	 @GetMapping("/member/userstatus")
-	 @ResponseBody
-	   public String getUserStatus (@AuthenticationPrincipal UserDetails userDetails) {
-		 
-		 if(userDetails != null) {
-			 return userDetails.getUsername();
-		 }
-		 else {
-			 return "null";
-		 }
-	 }
-	 
-	 
-	}
-	
 
+	@Autowired
+	public LoginController(MemberService memberService, PasswordEncoder passwordEncoder) {
+
+		this.memberService = memberService;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	@GetMapping("/member/login")
+	public String getLogin() {
+
+		return "member/login";
+	}
+
+	@GetMapping("/member/userstatus")
+	@ResponseBody
+	public String getUserStatus(@AuthenticationPrincipal UserDetails userDetails) {
+		
+		return userDetails != null ? "로그인됨" : "null";		 
+		
+	}
+
+}

@@ -125,35 +125,30 @@
 
 	<!-- Page level custom scripts -->
 	<script src="/resources/js/demo/datatables-demo.js"></script>
-
+	<script src="/resources/functionJS/ajax.js"></script>
+	<script src="/resources/functionJS/global.js"></script>
+	<script src="/resources/functionJS/validate.js"></script>
 
 </body>
 <script type="text/javascript">
 	$('#goWrite').on('click', function() {
-
-		$.ajax({
-			url : "/member/userstatus",
-			type : "GET",
-			success : function(response) {
-				if (response === 'null') {
-					if (confirm("로그인 하시겠습니까?")) {
-						window.location.href = "/member/login";
-
-					} else {
-						alert("취소 되었습니다");
-						return false;
-					}
+		ajax.get('/member/userstatus')
+		.then(function(response){			
+			if (response === 'null') {
+				if (confirm("로그인 하시겠습니까?")) {
+					window.location.href = "/member/login";
 				} else {
-					window.location.href = "/board/write";
+					alertMessage("취소 되었습니다");
+					return false;
 				}
-			},
-			error : function(xhr, status, error) {
-				alert("오류가 발생했습니다.");
-				window.location.href = "/error/error";
+			} else {
+				window.location.href = "/board/write";
 			}
-
-		});
-
+		})
+		.catch(function(err){
+			alertMessage('오류가 발생했습니다');
+			window.location.href = "/error/error";
+		})
 	});
 </script>
 
